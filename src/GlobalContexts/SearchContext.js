@@ -51,9 +51,9 @@ export const SearchProvider = ({ children }) => {
   //two types of data between captain and engineers
   const providedValue = {
     //information from engineers to captain, about the motor state
-    books: state.books,
+    searchBooks: state.books,
     //orders from captain to engineers, about how will be the motor state
-    setBooks: (books) => {dispatch({type: 'SET_BOOKS', payload: books}); }, 
+    setSearchBooks: (books) => {dispatch({type: 'SET_BOOKS', payload: books}); }, 
   }
 
   //connecting cables with the captain

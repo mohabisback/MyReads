@@ -42,13 +42,18 @@ scroll-behavior: smooth;
 `
 const SearchPage = () => {
   const location = useLocation();
-  const {books} = useContext(SearchContext)
+  const {searchBooks} = useContext(SearchContext)
   return (
     <Wrapper>
-      {books.length > 2 && location.pathname === '/search' &&
-        books.map((book, index)=>(
-          <BookCard key={index} book={book}/>
-        ))
+      {location.pathname === '/search' &&
+        ( searchBooks.length > 0
+          ?
+          searchBooks.map((book, index)=>(
+            <BookCard key={index} book={book}/>
+          ))
+          :
+          <h1>No Book found, try to search again.</h1>
+        )
       }
     </Wrapper>
   )

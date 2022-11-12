@@ -3,6 +3,7 @@ import {FaSearch} from 'react-icons/fa';
 import {search} from '../../../services/BookAPI'
 import {SearchItem, SeeAll} from './SearchItem'
 import SearchContext from '../../../GlobalContexts/SearchContext'
+import BooksContext from '../../../GlobalContexts/BooksContext'
 import {Link, useLocation, useNavigate} from 'react-router-dom'
 
 const SearchBar = () => {
@@ -10,18 +11,39 @@ const SearchBar = () => {
   const location = useLocation()
   const [query, setQuery] = React.useState('')
   const [dropdown, setDropdown] = React.useState(false)
-  const {books, setBooks} = React.useContext(SearchContext)
-  const writing = async (query)=> {
-    setQuery(query);
-    if (query.length > 2){
-      setDropdown(true)
-      const searchResults = await search(query, 20);
-      if(!searchResults.error){setBooks(searchResults)}
-    } else {
-      setDropdown(false)
-      setBooks([])
-    }
-  }
+  const {searchBooks, setSearchBooks} = React.useContext(SearchContext)
+  const {books, setBooks} = React.useContext(BooksContext)
+
+  //debouncing
+  React.useEffect(() => {
+    const debounce = setTimeout(
+      async ()=>{
+        if (query.length > 0){
+          setDropdown(true)
+          const searchResults = await search(query, 20);
+          if(!searchResults.error){
+            for (const group of books){
+              for (const book of group.books){
+                for (const searchBook of searchResults){
+                  if (searchBook.id === book.id){
+                    searchBook.shelf = book.shelf
+                  }
+                }
+              }
+            }
+            setSearchBooks(searchResults)
+          }
+        } else {
+          setDropdown(false)
+          setSearchBooks([])
+        }
+      }
+    , 1000);
+    return () => {clearTimeout(debounce);}
+  }, [query, setSearchBooks])
+  
+
+
   return (
     <div className={'nav-item'}>
       <Link to={`/search${query ? `?query=${query}` : ''}`}>
@@ -29,11 +51,11 @@ const SearchBar = () => {
       </Link>
       <input type='text' value={query} placeholder=''
       onKeyDown={(e)=>{if(e.key==='Enter'){navigate(`/search${query ? `?query=${query}` : ''}`)}}}
-      onChange={(e)=>{writing(e.target.value)}}/>
+      onChange={(e)=>{setQuery(e.target.value)}}/>
       <div className={`nav-dropdown ${dropdown ? " show" : ""}`}>
-        {location.pathname !== '/search' && books.length > 0 && 
+        {location.pathname !== '/search' && searchBooks.length > 0 && 
           <ul >
-           {books.slice(0,5).map((item, index) => (
+           {searchBooks.slice(0,5).map((item, index) => (
             <SearchItem item={item} key={index} setDropdown = {setDropdown} setQuery={setQuery}/>
            ))}
             <SeeAll query={query} key={1000} setDropdown = {setDropdown} setQuery={setQuery}/> 

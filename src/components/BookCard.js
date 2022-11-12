@@ -55,17 +55,18 @@ height: 100%;
 
 
 const BookCard = ({book}) => {
-  const {updateBooks} = React.useContext(BooksContext)
+  const {moveBook} = React.useContext(BooksContext)
   const [selectValue, setSelectValue] = React.useState('newBook')
   
   React.useEffect(()=>{
     if(book.shelf){ setSelectValue(book.shelf)}
   },[book.shelf])
 
-  const moveBook = async (newShelf) => {
-    await update(book, newShelf)
-    updateBooks()
+  const newShelfFunc = async (shelf) => {
+    moveBook({book, shelf})
+    await update(book, shelf)
   }
+
   let authors = 'Authors: '
   if (book?.authors && book?.authors.length > 0){
     authors = authors + book?.authors[0]
@@ -91,7 +92,7 @@ const BookCard = ({book}) => {
 
         <ButtonStyled primary as='select' 
           value={selectValue}
-          onChange={(e)=>{moveBook(e.target.value)}}
+          onChange={(e)=>{newShelfFunc(e.target.value)}}
         >
           <option value={'currentlyReading'}>Reading...</option>
           <option value={'wantToRead'}>Wanted...</option>

@@ -21,6 +21,25 @@ export const BooksReducer = (state, action) => {
         return {
           books: [...payload] //copy of the books, not the original object
         }
+      case 'MOVE_BOOK':
+        const newBooks = [...state.books]  
+        const book = payload.book
+        const shelf = payload.shelf
+        book.shelf = shelf
+        for (const group of newBooks){
+          for (let i = 0; i < group.books.length; i++){
+            if (group.books[i].id === book.id){
+              group.books.splice(i, 1)
+            }
+          }
+          if (group.shelf === shelf){
+            group.books.push(book)
+          }
+        }
+        return {
+          books: newBooks
+        }
+        
     default:
       return state;
   }
@@ -71,6 +90,7 @@ export const BooksProvider = ({ children }) => {
     dispatch({type: 'SET_BOOKS', payload: arrangedBooks});
   }
 
+  //initialize
   React.useEffect(()=>{
     if (!state.books){    
       fetchBooks()
@@ -94,6 +114,7 @@ export const BooksProvider = ({ children }) => {
     books: state.books,
     //orders from captain to engineers, about how will be the motor state
     setBooks: (books) => {dispatch({type: 'SET_BOOKS', payload: books}); },
+    moveBook: (book) => {dispatch({type: 'MOVE_BOOK', payload: book}); },
     updateBooks: ()=>{fetchBooks()}
   }
 
