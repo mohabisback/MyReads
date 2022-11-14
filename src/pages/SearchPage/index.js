@@ -14,9 +14,9 @@ flex-wrap: wrap;
 align-content: center;
 scroll-behavior: smooth;
 
-}
+
 /* cards (children not grandchildren)*/
-& > *{
+& > * {
   margin: 2% 0 2% 2%;
   height: 50vh;
   max-height: 50vh;
@@ -38,8 +38,7 @@ scroll-behavior: smooth;
     min-width: 20vw;
   }
 }
-
-`
+  `
 const SearchPage = () => {
   const location = useLocation();
   const {searchBooks} = useContext(SearchContext)
